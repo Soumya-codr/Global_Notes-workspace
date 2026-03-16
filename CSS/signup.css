@@ -88,18 +88,9 @@ body {
   overflow: hidden;
 }
 
-/* Gradient Overlay/Image simulated */
+/* Removed overlay to make logo bright */
 .card-left::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(225deg, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0.6) 100%);
-  /* Tinted overlay */
-  pointer-events: none;
-  z-index: 2;
+  display: none;
 }
 
 .brand-overlay {
@@ -146,6 +137,20 @@ body {
   margin-bottom: 8px;
   color: var(--text-primary);
   letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-accent {
+  color: var(--primary-color);
+  font-weight: 500;
+  opacity: 0.9;
+  font-size: 16px;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .toggle-text {

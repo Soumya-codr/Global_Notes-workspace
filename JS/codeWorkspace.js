@@ -440,7 +440,7 @@ class CodeWorkspace {
         document.getElementById('ai-panel-title').textContent = title;
         const contentEl = document.getElementById('ai-panel-content');
 
-        contentEl.innerHTML = this.renderMarkdown(content);
+        contentEl.innerHTML = this.renderMarkdown(content, false);
 
         if (hasImprovedCode) {
             const codeBlocks = content.match(/```([\s\S]*?)```/);
@@ -493,18 +493,18 @@ class CodeWorkspace {
         const lang = document.getElementById('language-selector').value;
 
         let htmlContent = `
-            <div style="border-bottom: 2px solid #5b5bd6; margin-bottom: 30px; padding-bottom: 10px;">
+            <div style="border-bottom: 2px solid #5b5bd6; margin-bottom: 30px; padding-bottom: 10px; page-break-inside: avoid;">
                 <h1 style="color: #5b5bd6; font-size: 24px; margin: 0;">Global Code Documentation</h1>
                 <p style="color: #91919a; font-size: 12px; margin-top: 5px;">Generated on ${date}</p>
             </div>
-            <h2 style="font-size: 20px; color: #1a1a1e;">${title}</h2>
+            <h2 style="font-size: 20px; color: #1a1a1e; margin-bottom: 20px;">${title}</h2>
         `;
 
         if (includeCode && editorCode) {
             htmlContent += `
-                <div style="margin: 20px 0;">
+                <div style="margin: 20px 0; page-break-inside: avoid;">
                     <h3 style="font-size: 16px; color: #5b5bd6; margin-bottom: 10px;">Source Code (${lang})</h3>
-                    <pre style="background: #f7f7f8; padding: 15px; border-radius: 8px; border: 1px solid #e5e5e8; font-family: 'JetBrains Mono', monospace; font-size: 12px; white-space: pre-wrap;"><code>${this.escapeHtml(editorCode)}</code></pre>
+                    <pre style="background: #f7f7f8; padding: 15px; border-radius: 8px; border: 1px solid #e5e5e8; font-family: 'JetBrains Mono', monospace; font-size: 12px; white-space: pre-wrap; overflow: hidden;"><code>${this.escapeHtml(editorCode)}</code></pre>
                 </div>
             `;
         }
@@ -512,16 +512,16 @@ class CodeWorkspace {
         if (content) {
             htmlContent += `
                 <div style="margin-top: 20px;">
-                    <h3 style="font-size: 16px; color: #5b5bd6; margin-bottom: 10px;">AI Documentation</h3>
+                    <h3 style="font-size: 16px; color: #5b5bd6; margin-bottom: 10px; page-break-after: avoid;">AI Documentation</h3>
                     <div style="line-height: 1.6; color: #555560; font-size: 14px;">
-                        ${this.renderMarkdown(content)}
+                        ${this.renderMarkdown(content, true)}
                     </div>
                 </div>
             `;
         }
 
         htmlContent += `
-            <div style="margin-top: 50px; border-top: 1px solid #e5e5e8; padding-top: 20px; font-size: 10px; color: #91919a; text-align: center;">
+            <div style="margin-top: 60px; border-top: 1px solid #e5e5e8; padding-top: 20px; font-size: 10px; color: #91919a; text-align: center; page-break-inside: avoid;">
                 © 2026 Global Notes Workspace — Expert Coding Documentation
             </div>
         `;
@@ -537,20 +537,22 @@ class CodeWorkspace {
             pre.style.overflowX = 'auto';
             pre.style.fontFamily = 'JetBrains Mono, monospace';
             pre.style.fontSize = '12px';
+            pre.style.pageBreakInside = 'avoid';
         });
 
         const opt = {
             margin: 10,
             filename: `${title.replace(/\s+/g, '_').toLowerCase()}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         html2pdf().set(opt).from(element).save();
     }
 
-    renderMarkdown(text) {
+    renderMarkdown(text, forPDF = false) {
         const codeBlocks = [];
         const placeholder = (i) => `__CODE_BLOCK_${i}__`;
 
@@ -566,8 +568,8 @@ class CodeWorkspace {
 
             const escaped = this.escapeHtml(cleanCode);
             codeBlocks.push(`
-                <div class="code-block-container" style="position: relative; margin: 10px 0;">
-                    <button class="chat-copy-btn" onclick="window.workspace.copyChatCode(this)">Copy</button>
+                <div class="code-block-container" style="position: relative; margin: 10px 0; page-break-inside: avoid;">
+                    ${forPDF ? '' : '<button class="chat-copy-btn" onclick="window.workspace.copyChatCode(this)">Copy</button>'}
                     <pre><code>${escaped}</code></pre>
                 </div>
             `);
@@ -707,7 +709,7 @@ class CodeWorkspace {
             this.chatHistory.push({ role: "assistant", content: aiMsg });
 
             // Render with the new markdown helper
-            loadingEl.innerHTML = this.renderMarkdown(aiMsg);
+            loadingEl.innerHTML = this.renderMarkdown(aiMsg, false);
 
             const messagesContainer = document.getElementById('chat-messages');
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
