@@ -129,6 +129,7 @@ export function wireFormattingToolbar() {
       // Apply the saved font size to content area
       if (contentEl) {
         contentEl.style.fontSize = `${savedSize}px`;
+        contentEl.style.setProperty("--editor-font-size", `${savedSize}px`);
       }
     } catch {
       // Default to 15px if localStorage fails
@@ -144,8 +145,10 @@ export function wireFormattingToolbar() {
 
       // Apply new font size to content area
       if (contentEl) {
+        contentEl.style.setProperty("--editor-font-size", `${size}px`);
+        // Also keep the actual font-size property for compatibility if needed
         contentEl.style.fontSize = `${size}px`;
-        // Force browser to recogn ize the change
+        // Force browser to recognize the change
         contentEl.offsetHeight;
       }
 
