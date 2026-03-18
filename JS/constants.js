@@ -14,8 +14,8 @@ export const ACTIVE_USER_KEY = "notesWorkspace.activeUser";
 // Versioned (v1) to allow for future data structure changes
 export const ACCOUNT_KEY = "notesWorkspace.accounts.v1";
 
-// Key for storing the user's theme preference in localStorage
+// Key for storing the user's theme preference in localStorage (Notes Workspace)
 export const THEME_KEY = "notesWorkspace.theme";
 
-
-
+// Key for storing the user's theme preference in Code Workspace
+export const CODE_THEME_KEY = "codeWorkspace.theme";

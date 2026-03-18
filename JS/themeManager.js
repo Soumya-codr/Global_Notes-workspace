@@ -3,10 +3,17 @@ import { THEME_KEY } from "./constants.js";
 const DEFAULT_THEME = "amoled-dark";
 const VALID_THEMES = ["amoled-dark", "nature-green", "corporate-gray", "minimal-white"];
 
+let currentStorageKey = THEME_KEY; // Default to Notes Workspace theme key
+
+// Overrides the storage key to use for following operations (e.g., Code Workspace)
+export function setThemeStorageKey(key) {
+  currentStorageKey = key;
+}
+
 // Retrieves the user's preferred theme from localStorage or returns the default AMOLED dark theme
 export function getStoredTheme() {
   try {
-    const stored = localStorage.getItem(THEME_KEY);
+    const stored = localStorage.getItem(currentStorageKey);
     return VALID_THEMES.includes(stored) ? stored : DEFAULT_THEME;
   } catch {
     return DEFAULT_THEME;
@@ -48,12 +55,34 @@ export function applyTheme(theme) {
       target.classList.toggle("hidden", isDark);
     }
   }
+
+  // Synchronize icons for quick-toggle if button exists
+  updateQuickToggleState(normalized);
+}
+
+// Updates the visibility of Sun/Moon icons in the quick-toggle button
+function updateQuickToggleState(theme) {
+  const sunIcon = document.querySelector(".theme-icon-sun");
+  const moonIcon = document.querySelector(".theme-icon-moon");
+
+  if (!sunIcon || !moonIcon) return;
+
+  // If currently dark, show Sun to switch to light. If currently light, show Moon for dark.
+  const isDark = theme.includes("dark") || theme === "corporate-gray";
+
+  if (isDark) {
+    sunIcon.classList.remove("hidden");
+    moonIcon.classList.add("hidden");
+  } else {
+    sunIcon.classList.add("hidden");
+    moonIcon.classList.remove("hidden");
+  }
 }
 
 // Saves the user's theme preference to localStorage and applies it
 export function persistTheme(theme) {
   try {
-    localStorage.setItem(THEME_KEY, theme);
+    localStorage.setItem(currentStorageKey, theme);
   } catch {
     // ignore storage issues
   }
@@ -77,13 +106,11 @@ export function wireThemeToggle() {
     });
   }
 
-  // 3. Handle Custom Buttons
+  // 3. Handle Custom Buttons (Dropdown options)
   const themeButtons = document.querySelectorAll(".theme-option");
   themeButtons.forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // prevent closing dropdown if we want, or let it close?
-      // Usually users might want to see the change immediately.
-      // But let's keep dropdown open to allow switching back if they don't like it.
+      e.stopPropagation();
       const val = btn.dataset.value;
       if (val) {
         persistTheme(val);
@@ -93,8 +120,24 @@ export function wireThemeToggle() {
     });
   });
 
+  // 4. Handle Quick Toggle Button (Navbar)
+  const quickToggle = document.querySelector("#theme-quick-toggle");
+  if (quickToggle) {
+    quickToggle.addEventListener("click", () => {
+      const current = getStoredTheme();
+      // Decide toggle target: if currently dark, go to a white theme; otherwise go to dark.
+      const isDark = current.includes("dark") || current === "corporate-gray";
+      const target = isDark ? "minimal-white" : "amoled-dark";
+
+      persistTheme(target);
+      updateButtonState(target);
+      if (selector) selector.value = target;
+    });
+  }
+
   // Initial button state
   updateButtonState(currentTheme);
+  updateQuickToggleState(currentTheme);
 
   function updateButtonState(activeTheme) {
     themeButtons.forEach(btn => {

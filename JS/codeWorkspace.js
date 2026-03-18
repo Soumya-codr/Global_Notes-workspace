@@ -1,5 +1,7 @@
 import config from './config.js';
 import { generateTextWithGemini } from './geminiAPI.js';
+import { wireThemeToggle, setThemeStorageKey } from './themeManager.js';
+import { CODE_THEME_KEY } from './constants.js';
 
 const STORAGE_KEY = 'antigravity_snippets';
 
@@ -52,6 +54,8 @@ class CodeWorkspace {
     }
 
     init() {
+        setThemeStorageKey(CODE_THEME_KEY);
+        wireThemeToggle();
         this.initEditor();
         this.renderSnippetList();
         this.attachEventListeners();

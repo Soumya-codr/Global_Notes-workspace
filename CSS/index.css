@@ -483,6 +483,27 @@ body {
   stroke-width: inherit;
 }
 
+/* Theme Quick Toggle Icons */
+.theme-icon-sun,
+.theme-icon-moon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#theme-quick-toggle:hover .icon {
+  transform: rotate(15deg) scale(1.1);
+  color: var(--primary);
+}
+
+[data-theme="minimal-white"] .theme-icon-sun {
+  color: #f39c12;
+  /* Golden sun for light theme */
+}
+
+[data-theme="amoled-dark"] .theme-icon-moon {
+  color: #f1c40f;
+  /* Moon glow for dark theme */
+}
+
 /* ════════════════════════════════════════
    HEADER
    ════════════════════════════════════════ */
