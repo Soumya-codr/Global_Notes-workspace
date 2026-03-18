@@ -1991,8 +1991,9 @@ body {
 .editor-content,
 .content-input {
   min-height: 300px;
-  font-size: 15px;
-  line-height: 1.7;
+  --base-line-height: 1.8;
+  font-size: var(--editor-font-size, 15px);
+  line-height: var(--base-line-height);
   color: var(--text);
   outline: none;
   padding: 16px;
@@ -2006,9 +2007,17 @@ body {
 }
 
 .content-input[data-pattern="lined"] {
-  background-image: repeating-linear-gradient(transparent, transparent 25.5px, var(--border) 25.5px, var(--border) 27px);
+  --line-spacing: calc(var(--editor-font-size, 15px) * var(--base-line-height, 1.8));
+  background-image: repeating-linear-gradient(
+    transparent, 
+    transparent calc(var(--line-spacing) - 1px), 
+    var(--border) calc(var(--line-spacing) - 1px), 
+    var(--border) var(--line-spacing)
+  );
+  background-attachment: local;
   background-color: var(--surface);
-  line-height: 27px;
+  line-height: var(--line-spacing);
+  padding-top: calc(var(--line-spacing) * 0.38); /* Refined padding for better baseline alignment */
 }
 
 .content-input[data-pattern="grid"] {
