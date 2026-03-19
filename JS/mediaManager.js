@@ -1,6 +1,6 @@
 import { escapeHtml, showToast } from "./utilities.js";
 import { insertHtmlAtCursor } from "./formattingToolbar.js";
-import { SketchPad } from "./sketchPad.js";
+
 import { AudioRecorder } from "./audioRecorder.js";
 
 const MAX_FILE_SIZE_MB = 10;
@@ -14,9 +14,10 @@ export function wireUploadButtons() {
 
   const mediaInput = $("#media-upload-input");
   const fileInput = $("#file-upload-input");
+  const audioModal = $("#audio-modal"); // Moved up from Modal Logic section
 
   // Initialize helpers
-  const sketchPad = new SketchPad('sketch-canvas');
+
   const audioRecorder = new AudioRecorder();
 
   // Insert dropdown handler
@@ -31,14 +32,12 @@ export function wireUploadButtons() {
           if (mediaInput) mediaInput.click();
           break;
         case "audio":
-          openAudioModal();
+          if (audioModal) audioModal.showModal();
           break;
         case "file":
           if (fileInput) fileInput.click();
           break;
-        case "sketch":
-          openSketchModal();
-          break;
+
         case "shapes":
           const shapesModal = document.getElementById("shapes-modal");
           if (shapesModal) shapesModal.showModal();
@@ -162,19 +161,8 @@ export function wireUploadButtons() {
 
   // --- Modals Logic ---
 
-  const audioModal = $("#audio-modal");
-  const sketchModal = $("#sketch-modal");
 
-  function openAudioModal() {
-    if (audioModal) audioModal.showModal();
-  }
 
-  function openSketchModal() {
-    if (sketchModal) {
-      sketchPad.reset();
-      sketchModal.showModal();
-    }
-  }
 
   // Modal Buttons
   const saveAudioBtn = $("#save-audio-btn");
@@ -189,14 +177,7 @@ export function wireUploadButtons() {
     });
   }
 
-  const saveSketchBtn = $("#save-sketch-btn");
-  if (saveSketchBtn) {
-    saveSketchBtn.addEventListener("click", () => {
-      const dataUrl = sketchPad.getImageDataUrl();
-      insertImage(dataUrl);
-      if (sketchModal) sketchModal.close();
-    });
-  }
+
 
   // Close buttons delegated handling handled by layoutManager or generic close listeners usually, 
   // but let's ensure specific modal close buttons work here just in case.

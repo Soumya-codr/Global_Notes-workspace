@@ -522,7 +522,7 @@
               <option value="photo-video">Photo / Video</option>
               <option value="audio">Audio</option>
               <option value="file">File</option>
-              <option value="sketch">Sketch</option>
+
               <option value="shapes">Shapes</option>
               <option value="table">Table</option>
             </select>
@@ -678,33 +678,7 @@
     </div>
   </dialog>
 
-  <!-- Sketch Pad Modal -->
-  <dialog id="sketch-modal" class="modal large">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Add Sketch</h2>
-        <button class="btn-icon close-modal">&times;</button>
-      </div>
-      <div class="sketch-body">
-        <canvas id="sketch-canvas" width="600" height="400"></canvas>
-        <div class="sketch-tools">
-          <button class="btn tiny active" id="tool-pen">Pen</button>
-          <button class="btn tiny" id="tool-eraser">Eraser</button>
-          <div class="divider-vertical"></div>
-          <button class="btn tiny" id="sketch-undo" title="Undo">&larrhk;</button>
-          <button class="btn tiny" id="sketch-redo" title="Redo">&rarrhk;</button>
-          <div class="divider-vertical"></div>
-          <input type="color" id="sketch-color" value="#000000" title="Color">
-          <input type="range" id="sketch-size" min="1" max="20" value="2" title="Size">
-          <button class="btn tiny danger" id="tool-clear">Clear</button>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn secondary close-modal">Cancel</button>
-        <button class="btn primary" id="save-sketch-btn">Insert Sketch</button>
-      </div>
-    </div>
-  </dialog>
+
 
   <!-- Shapes Modal -->
   <dialog id="shapes-modal" class="modal">
