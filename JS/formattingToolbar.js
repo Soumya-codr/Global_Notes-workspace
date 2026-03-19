@@ -118,51 +118,53 @@ export function wireFormattingToolbar() {
     });
   }
 
-  // Text size control with proper event handling
-  const textSizeSelect = $("#text-size");
-  if (textSizeSelect) {
-    try {
-      // Load saved size preference from localStorage
-      const savedSize = localStorage.getItem("notesWorkspace.textSize") || "15";
-      // Set the select dropdown to the saved value
-      textSizeSelect.value = savedSize;
-      // Apply the saved font size to content area
-      if (contentEl) {
-        contentEl.style.fontSize = `${savedSize}px`;
-        contentEl.style.setProperty("--editor-font-size", `${savedSize}px`);
-      }
-    } catch {
-      // Default to 15px if localStorage fails
-      if (contentEl) {
-        contentEl.style.fontSize = "15px";
-      }
-    }
+  // Font size stepper control
+  const fontSizeInput = $("#font-size-input");
+  const decreaseBtn = $("#decrease-font-size");
+  const increaseBtn = $("#increase-font-size");
 
-    // Listen for changes to text size dropdown
-    textSizeSelect.addEventListener("change", (e) => {
-      const size = e.target.value;
-      console.log("Text size changed to:", size);
+  if (fontSizeInput && decreaseBtn && increaseBtn) {
+    const updateFontSize = (newSize) => {
+      // Keep size within bounds
+      const size = Math.min(100, Math.max(1, parseInt(newSize) || 15));
+      fontSizeInput.value = size;
 
-      // Apply new font size to content area
       if (contentEl) {
         contentEl.style.setProperty("--editor-font-size", `${size}px`);
-        // Also keep the actual font-size property for compatibility if needed
         contentEl.style.fontSize = `${size}px`;
-        // Force browser to recognize the change
+        // Force layout recalculation
         contentEl.offsetHeight;
       }
 
       try {
-        // Persist the user's choice to localStorage
         localStorage.setItem("notesWorkspace.textSize", size);
       } catch (err) {
-        console.warn("Failed to save text size preference:", err);
+        console.warn("Failed to save font size preference:", err);
       }
+    };
+
+    // Load saved size preference from localStorage
+    const savedSize = localStorage.getItem("notesWorkspace.textSize") || "15";
+    updateFontSize(savedSize);
+
+    // Increase button click
+    increaseBtn.addEventListener("click", () => {
+      updateFontSize(parseInt(fontSizeInput.value) + 1);
     });
 
-    console.log("Text size control initialized");
+    // Decrease button click
+    decreaseBtn.addEventListener("click", () => {
+      updateFontSize(parseInt(fontSizeInput.value) - 1);
+    });
+
+    // Direct input change
+    fontSizeInput.addEventListener("input", (e) => {
+      updateFontSize(e.target.value);
+    });
+
+    console.log("Font size stepper initialized");
   } else {
-    console.warn("Text size select element not found");
+    console.warn("Font size stepper elements not found");
   }
 
 

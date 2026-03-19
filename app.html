@@ -154,7 +154,7 @@
               <div class="toggle-row">
                 <label for="auto-save-toggle" class="dropdown-label">Auto Save</label>
                 <label class="toggle-switch" for="auto-save-toggle">
-                  <input type="checkbox" id="auto-save-toggle">
+                  <input type="checkbox" id="auto-save-toggle" checked>
                   <span class="toggle-slider"></span>
                 </label>
               </div>
@@ -317,10 +317,29 @@
 
     <!-- ─── EDITOR ─── -->
     <section class="editor">
-      <!-- Editor Header -->
-      <div class="editor-header">
-        <input type="text" class="title-input" id="title" placeholder="Untitled note" aria-label="Note title" />
-        <div class="editor-header-actions">
+      <!-- Dashboard View -->
+      <div id="dashboard-view" class="dashboard-view">
+        <div class="dashboard-header">
+          <h2 class="dashboard-title">My Notes</h2>
+          <div class="dashboard-stats" id="dashboard-stats">0 notes</div>
+        </div>
+        <div class="dashboard-grid" id="dashboard-grid">
+          <!-- Note cards will be rendered here -->
+        </div>
+      </div>
+
+      <!-- Editor View -->
+      <div id="editor-view" class="editor-view hidden">
+        <!-- Editor Header -->
+        <div class="editor-header">
+          <button class="btn ghost icon-only back-to-dashboard" id="back-to-dashboard" aria-label="Back to dashboard" title="Back">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          <input type="text" class="title-input" id="title" placeholder="Untitled note" aria-label="Note title" />
+          <div class="editor-header-actions">
           <button class="btn ghost icon-only" id="toggle-favorite" aria-label="Toggle favorite" title="Favorite">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -468,16 +487,11 @@
           </div>
           <div class="toolbar-divider"></div>
           <div class="toolbar-group">
-            <select id="text-size" class="select tiny" aria-label="Text size">
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15" selected>15</option>
-              <option value="16">16</option>
-              <option value="18">18</option>
-              <option value="20">20</option>
-              <option value="24">24</option>
-            </select>
+            <div class="font-size-stepper">
+              <button id="decrease-font-size" class="stepper-btn" aria-label="Decrease font size">-</button>
+              <input type="number" id="font-size-input" class="stepper-input" min="1" max="100" value="15">
+              <button id="increase-font-size" class="stepper-btn" aria-label="Increase font size">+</button>
+            </div>
             <select id="text-color" class="select tiny" aria-label="Text color">
               <option value="" selected>Color</option>
               <option value="#000000">Black</option>
