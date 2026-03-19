@@ -2647,31 +2647,7 @@ html[data-theme="corporate-gray"] .custom-select-wrapper:has(#note-theme) {
   color: var(--text-muted);
 }
 
-/* Sketch Modal */
-.sketch-body {
-  padding: 16px;
-}
 
-#sketch-canvas {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: #fff;
-}
-
-.sketch-tools {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.divider-vertical {
-  width: 1px;
-  height: 24px;
-  background: var(--border);
-}
 
 /* Shapes Modal */
 .shapes-body {

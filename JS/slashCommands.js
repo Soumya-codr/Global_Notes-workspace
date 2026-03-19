@@ -15,7 +15,6 @@ export function wireSlashCommands() {
       <div class="slash-item" data-cmd="bullet">Bullet List</div>
       <div class="slash-item" data-cmd="photo-video">Image/Video</div>
       <div class="slash-item" data-cmd="file">Attach File</div>
-      <div class="slash-item" data-cmd="sketch">Sketch</div>
       <div class="slash-item" data-cmd="audio">Record Audio</div>
       <div class="slash-item" data-cmd="table">Table</div>
     `;
