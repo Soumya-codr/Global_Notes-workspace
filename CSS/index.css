@@ -2011,6 +2011,56 @@ html,
   padding: 0 20px 0 6px;
 }
 
+.font-size-stepper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  height: 26px;
+  overflow: hidden;
+}
+
+.stepper-btn {
+  width: 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.stepper-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.stepper-input {
+  width: 32px;
+  height: 100%;
+  border: none;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  background: none;
+  color: var(--text);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.stepper-input::-webkit-outer-spin-button,
+.stepper-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .color-picker-tiny {
   width: 26px;
   height: 26px;
