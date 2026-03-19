@@ -17,7 +17,7 @@ export function getSearchQuery() {
 // Gets the current sort mode from the sort dropdown (e.g., 'updated_desc', 'title_asc')
 export function getSortMode() {
   const select = $("#sort");
-  return select ? select.value : "updated_desc";
+  return select ? select.value : "updated-desc";
 }
 
 // Retrieves the selected date from the date filter input
@@ -60,13 +60,13 @@ export function applyFilterSearchAndSort(baseNotes) {
 
   result.sort((a, b) => {
     switch (sortMode) {
-      case "updated_asc":
+      case "updated-asc":
         return (a.updatedAt || "").localeCompare(b.updatedAt || "");
-      case "title_asc":
+      case "title-asc":
         return (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" });
-      case "title_desc":
+      case "title-desc":
         return (b.title || "").localeCompare(a.title || "", undefined, { sensitivity: "base" });
-      case "updated_desc":
+      case "updated-desc":
       default:
         return (b.updatedAt || "").localeCompare(a.updatedAt || "");
     }
