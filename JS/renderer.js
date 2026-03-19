@@ -131,7 +131,15 @@ export function renderActiveNote(note, removeTagFromActiveNote) {
   const tagsContainer = $("#tags");
   const editorSection = $(".editor");
 
+  const dashboardView = $("#dashboard-view");
+  const editorView = $("#editor-view");
+  const layout = $(".layout");
+
   if (!note) {
+    if (dashboardView) dashboardView.classList.remove("hidden");
+    if (editorView) editorView.classList.add("hidden");
+    if (layout) layout.classList.remove("fullscreen-editor");
+
     if (titleInput) titleInput.value = "";
     if (contentInput) {
       contentInput.innerHTML = "";
@@ -141,6 +149,11 @@ export function renderActiveNote(note, removeTagFromActiveNote) {
     if (editorSection) editorSection.removeAttribute("data-theme");
     return;
   }
+
+  // Switch to Editor View
+  if (dashboardView) dashboardView.classList.add("hidden");
+  if (editorView) editorView.classList.remove("hidden");
+  if (layout) layout.classList.add("fullscreen-editor");
 
   if (titleInput) titleInput.value = note.title || "";
   if (contentInput) {
@@ -346,4 +359,48 @@ export function updateToolbarMetadata(note, overrideContent) {
     const charCount = text.replace(/\s/g, "").length; // use clean text for char count too or similar
     metadataCount.textContent = `${wordCount} words / ${charCount} chars`;
   }
+}
+
+/**
+ * Renders the Notes Dashboard (Gallery Grid)
+ * @param {Array} notes - Notes to display
+ * @param {Function} setActiveNote - Callback to open a note
+ */
+export function renderNotesDashboard(notes, setActiveNote) {
+  const gridEl = $("#dashboard-grid");
+  const statsEl = $("#dashboard-stats");
+  if (!gridEl) return;
+
+  gridEl.innerHTML = "";
+  const visibleNotes = applyFilterSearchAndSort(notes).filter(n => !n.isArchived);
+
+  if (statsEl) {
+    statsEl.textContent = `${visibleNotes.length} notes`;
+  }
+
+  if (!visibleNotes.length) {
+    gridEl.innerHTML = '<div class="note-card empty-dashboard"><p>No notes found. Create your first note!</p></div>';
+    return;
+  }
+
+  visibleNotes.forEach(note => {
+    const card = document.createElement("div");
+    card.className = "note-card";
+    if (note.theme) card.setAttribute("data-theme", note.theme);
+
+    const rawContent = (note.content || "");
+    const plainContent = rawContent.replace(/<[^>]*>/g, " ");
+    const previewText = plainContent.trim().slice(0, 150) + (plainContent.trim().length > 150 ? "…" : "");
+
+    card.innerHTML = `
+      <h3 class="note-title">${escapeHtml(note.title || "Untitled note")}</h3>
+      <p class="note-preview-compact">${escapeHtml(previewText || "Empty note")}</p>
+      <div class="note-card-footer">
+        <time class="note-time-label">${formatDate(note.updatedAt)}</time>
+      </div>
+    `;
+
+    card.addEventListener("click", () => setActiveNote(note.id));
+    gridEl.appendChild(card);
+  });
 }

@@ -1,7 +1,7 @@
 import { getActiveUser, setActiveUser, mergeGuestNotes } from "./storage.js";
 import { loadNotesForCurrentUser, ensureAtLeastOneNote, persistNotes } from "./noteManager.js";
 import { getFolders, saveFolders, syncFoldersFromCloud } from "./folderManager.js";
-import { renderNotesList, renderActiveNote, updateUserDisplay, renderFolders, updateToolbarMetadata } from "./renderer.js";
+import { renderNotesList, renderActiveNote, updateUserDisplay, renderFolders, updateToolbarMetadata, renderNotesDashboard } from "./renderer.js";
 import { wireFiltersAndSearch, wireSort, wireTagInput, wireCrudButtons, wireFolderButtons, wireThemeSelector, syncThemeSelector, wireEditorPatternSelector, syncEditorPatternSelector, wireDropdowns, wireLibraryNav } from "./eventHandlers.js";
 import { wireFormattingToolbar } from "./formattingToolbar.js";
 import { wireUploadButtons } from "./mediaManager.js";
@@ -45,6 +45,11 @@ function setActiveNote(noteId) {
   callbacks.renderActiveNote();
   syncThemeSelector(note);
   syncEditorPatternSelector(note);
+
+  // If we're entering Dashboard mode (noteId is null), refresh the dashboard grid
+  if (!noteId) {
+    callbacks.renderNotesDashboard();
+  }
 }
 
 const callbacks = {
@@ -54,15 +59,21 @@ const callbacks = {
   setActiveLibraryFilter: (filterType) => {
     state.activeLibraryFilter = filterType;
     state.activeFolderId = null; // Clear folder if library item selected
+    state.activeNoteId = null; // Enter dashboard mode on navigation
     callbacks.renderNotesList();
+    callbacks.renderActiveNote();
+    callbacks.renderNotesDashboard();
   },
 
   setActiveFolder: (folderId, targetLibraryId = null) => {
     state.activeFolderId = folderId;
     if (folderId) state.activeLibraryFilter = 'all'; // Reset library filter if folder selected
+    state.activeNoteId = null; // Enter dashboard mode on navigation
 
     callbacks.renderFolders();
     callbacks.renderNotesList();
+    callbacks.renderActiveNote();
+    callbacks.renderNotesDashboard();
 
     if (folderId) {
       import("./renderer.js").then(module => {
@@ -104,6 +115,8 @@ const callbacks = {
   ),
   // Renders the folders list in the sidebar
   renderFolders: () => renderFolders(state.folders, state.activeFolderId, callbacks.setActiveFolder),
+  // Renders the Dashboard Grid
+  renderNotesDashboard: () => renderNotesDashboard(state.notes, setActiveNote),
   // Updates the UI to show the current user's information
   updateUserDisplay: () => {
     updateUserDisplay(state.activeUser);
@@ -119,9 +132,8 @@ const callbacks = {
     state.notes = await loadNotesForCurrentUser(state.activeUser);
     state.folders = await syncFoldersFromCloud(state.activeUser);
     await ensureAtLeastOneNote(state.notes, state.activeUser);
-    if (!state.activeNoteId && state.notes.length) {
-      state.activeNoteId = state.notes[0].id;
-    }
+    // Start with Dashboard (no active note) as requested
+    state.activeNoteId = null;
   },
 };
 
@@ -158,9 +170,7 @@ async function initApp() {
   }
 
   // Set initial active note
-  if (state.notes.length && !state.activeNoteId) {
-    state.activeNoteId = state.notes[0].id;
-  }
+  state.activeNoteId = null;
 
   // Wire up all event handlers
   wireFiltersAndSearch(callbacks);
@@ -191,6 +201,14 @@ async function initApp() {
   wireEditorQuickTools(); // Wire editor bar AI & Mail quick-tool popovers
   upgradeToolbarSelects(); // Transform native selects into polished dropdowns
 
+  // Wire Back to Dashboard
+  const backBtn = document.getElementById("back-to-dashboard");
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      setActiveNote(null);
+    });
+  }
+
   // Initialize Smart Calendar
   state.calendarWidget = initSmartCalendar(state, callbacks);
 
@@ -215,6 +233,7 @@ async function initApp() {
   callbacks.renderFolders();
   callbacks.renderNotesList();
   callbacks.renderActiveNote();
+  callbacks.renderNotesDashboard();
 
   // Check for shared URL params LAST (User's preferred flow)
   checkSharedUrl();

@@ -31,10 +31,12 @@ export function wireAutoSave(state, callbacks) {
 
     if (!titleInput || !contentInput || !autoSaveToggle) return;
 
-    // Load auto-save preference from localStorage
+    // Load auto-save preference from localStorage (Default to TRUE if not set)
     const savedAutoSavePref = localStorage.getItem("autoSaveEnabled");
-    if (savedAutoSavePref === "true") {
+    if (savedAutoSavePref === null || savedAutoSavePref === "true") {
         autoSaveToggle.checked = true;
+    } else {
+        autoSaveToggle.checked = false;
     }
 
     // Save preference when toggled
@@ -45,10 +47,9 @@ export function wireAutoSave(state, callbacks) {
     // The actual save function
     const performAutoSave = () => {
         // Only save if:
-        // 1. Auto-save is enabled
-        // 2. We have a valid active user (guests might not want auto-save or it might be confusing)
-        // 3. We have an active note
-        if (!autoSaveToggle.checked || !state.activeUser || !state.activeNoteId) return;
+        // 1. Auto-save is enabled (checkbox checked)
+        // 2. We have an active note
+        if (!autoSaveToggle.checked || !state.activeNoteId) return;
 
         const note = state.notes.find((n) => n.id === state.activeNoteId);
         if (!note) return;

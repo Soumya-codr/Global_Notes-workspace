@@ -338,7 +338,11 @@ body {
   background: transparent;
 }
 
+html,
+.app-sidebar,
+.notes-list,
 .notes-section,
+.dashboard-view,
 .editor-body {
   scroll-behavior: smooth;
 }
@@ -1577,6 +1581,126 @@ body {
   overflow: hidden;
   background: var(--surface);
   position: relative;
+  transition: all var(--transition-smooth);
+}
+
+/* ── Dashboard View ── */
+.dashboard-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.dashboard-view.hidden {
+  display: none;
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+}
+
+.dashboard-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.dashboard-stats {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding-bottom: 40px;
+}
+
+/* Reusing note-card for dashboard grid */
+.dashboard-grid .note-card {
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard-grid .note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary-light);
+}
+
+.dashboard-grid .note-title {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.dashboard-grid .note-preview-compact {
+  font-size: 13px;
+  color: var(--text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+/* ── Fullscreen Editor Mode ── */
+.layout.fullscreen-editor {
+  grid-template-columns: 1fr;
+}
+
+.layout.fullscreen-editor .app-sidebar {
+  display: none;
+}
+
+.layout.fullscreen-editor .editor {
+  background: var(--bg); /* Darker background for focused writing */
+}
+
+.editor-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.editor-view.hidden {
+  display: none;
+}
+
+.layout.fullscreen-editor .mobile-toggle {
+  display: none !important;
+}
+
+/* Back to Dashboard Button */
+.back-to-dashboard {
+  margin-right: 8px;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-view {
+    padding: 16px;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Editor Header */
