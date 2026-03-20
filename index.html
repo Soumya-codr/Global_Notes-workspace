@@ -22,36 +22,49 @@
     <div class="container navbar">
       <a href="/" class="brand">
         <img src="assets/images/logo_workspace.png" alt="Global Notes Workspace">
-        <span>Global Notes <span style="color: var(--primary);">Workspace</span></span>
+        <span>Global Notes Workspace</span>
       </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#solutions">Solutions</a>
+        <a href="#">Pricing</a>
+      </div>
       <a href="HTML/signup.html" class="btn btn-primary">Get Started</a>
     </div>
   </nav>
 
   <header class="hero">
     <div class="container">
-      <div class="badge">Built for every professional</div>
+      <div class="badge">Professional Workspace</div>
       <h1 style="font-family: 'Outfit', sans-serif;">Your Smart Workspace for<br>Notes, Ideas, and Knowledge</h1>
       <p>Write notes, organize ideas, sync code snippets, and manage your knowledge in one powerful workspace designed
         for focus.</p>
       <div class="hero-btns">
-        <a href="HTML/signup.html" class="btn btn-primary">Get Started</a>
+        <a href="HTML/signup.html" class="btn btn-primary">Get Started for Free</a>
         <a href="#features" class="btn btn-secondary">Explore Features</a>
       </div>
-      <div class="hero-mockup">
-        <img src="assets/images/app-mockup.png" alt="App Mockup">
+
+      <div class="hero-mockups">
+        <div class="mockup-container">
+          <span>Notes Workspace</span>
+          <img src="assets/images/notes_workspace_real.png" alt="Notes Workspace Mockup">
+        </div>
+        <div class="mockup-container">
+          <span>Code Workspace</span>
+          <img src="assets/images/code_workspace_real.png" alt="Code Workspace Mockup">
+        </div>
       </div>
     </div>
   </header>
 
   <section class="container" id="features">
-    <div class="section-title">
+    <div class="section-title reveal">
       <p
-        style="color: var(--primary); font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;">
+        style="color: var(--primary); font-weight: 800; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.75rem;">
         Use Cases</p>
       <h2 style="font-family: 'Outfit', sans-serif;">Built for Everyone Who Works<br>With Information</h2>
     </div>
-    <div class="features-grid">
+    <div class="features-grid reveal">
       <div class="feature-card">
         <div class="feature-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -104,12 +117,12 @@
     </div>
   </section>
 
-  <section style="background-color: var(--bg-soft);">
+  <section id="solutions" style="background-color: var(--bg-soft);">
     <div class="container">
-      <div class="section-title">
+      <div class="section-title reveal">
         <h2 style="font-family: 'Outfit', sans-serif;">One Workspace for Thoughts<br>and Knowledge</h2>
       </div>
-      <div class="features-grid">
+      <div class="features-grid reveal">
         <div class="feature-card">
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -154,11 +167,11 @@
     </div>
   </section>
 
-  <section class="container">
-    <div class="cta-section">
+  <section class="cta-section">
+    <div class="container">
       <h2 style="font-family: 'Outfit', sans-serif;">Turn Your Ideas and Knowledge into an Organized Workspace</h2>
       <p>Join thousands of professionals and students who have transformed their note-taking experience.</p>
-      <a href="HTML/signup.html" class="btn btn-white">Get Started for Free</a>
+      <a href="HTML/signup.html" class="btn btn-white btn-large">Get Started for Free</a>
     </div>
   </section>
 
@@ -213,14 +226,30 @@
   </footer>
 
   <script>
+    // Navbar Scroll Effect
     window.addEventListener('scroll', () => {
       const nav = document.getElementById('landing-nav');
-      if (window.scrollY > 50) {
+      if (window.scrollY > 20) {
         nav.classList.add('scrolled');
       } else {
         nav.classList.remove('scrolled');
       }
     });
+
+    // Reveal on Scroll
+    const observerOptions = {
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
 
 </body>
