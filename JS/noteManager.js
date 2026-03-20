@@ -33,18 +33,19 @@ export async function persistNotes(activeUser, notes) {
 }
 
 // Ensures there's at least one note by creating a welcome note if none exist
+// NOTE: Disabled as per user request to allow 0 notes state.
 export async function ensureAtLeastOneNote(notes, activeUser) {
-  if (!notes.length) {
-    // Create welcome note as default
-    const initial = createNote({
-      title: "Welcome to Notes Workspace",
-      content:
-        "This is your first note. Use the sidebar to switch notes, add tags above, and search from the top bar.\n\nYour notes are saved locally in this browser.",
-      tags: ["ideas"],
-    });
-    notes.push(initial);
-    await persistNotes(activeUser, notes);
-  }
+  // if (!notes.length) {
+  //   // Create welcome note as default
+  //   const initial = createNote({
+  //     title: "Welcome to Notes Workspace",
+  //     content:
+  //       "This is your first note. Use the sidebar to switch notes, add tags above, and search from the top bar.\n\nYour notes are saved locally in this browser.",
+  //     tags: ["ideas"],
+  //   });
+  //   notes.push(initial);
+  //   await persistNotes(activeUser, notes);
+  // }
   return notes;
 }
 

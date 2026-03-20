@@ -125,29 +125,21 @@ export async function handleDeleteNote(notes, activeNoteId, activeUser, callback
   );
   if (!confirmed) return;
 
-  if (notes.length === 1) {
-    const only = notes[0];
-    only.title = "";
-    only.content = "";
-    only.tags = [];
-    only.updatedAt = new Date().toISOString();
-    persistNotes(activeUser, notes);
-    callbacks.renderActiveNote();
-    callbacks.renderNotesList();
-    showToast("Note cleared", "success");
-    return;
-  }
   // Filter out the note to delete
   const filteredNotes = notes.filter((n) => n.id !== activeNoteId);
+
   // Delete from Supabase
   deleteNoteFromCloud(activeNoteId).catch(err => {
-    showToast("Note deleted locally but cloud sync failed", "warning");
+    console.error("Cloud deletion failed", err);
   });
-  // Update the notes array by removing deleted note
+
+  // Update original array
   notes.splice(0, notes.length, ...filteredNotes);
-  // Set active note to first remaining note
+
+  // If no notes left, go to dashboard
   const nextActiveId = filteredNotes.length > 0 ? filteredNotes[0].id : null;
-  persistNotes(activeUser, notes);
+
+  await persistNotes(activeUser, notes);
   callbacks.setActiveNote(nextActiveId);
   showToast("Note deleted", "success");
 }
