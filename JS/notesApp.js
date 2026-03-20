@@ -117,7 +117,9 @@ const callbacks = {
   // Renders the folders list in the sidebar
   renderFolders: () => renderFolders(state.folders, state.activeFolderId, callbacks.setActiveFolder),
   // Renders the Dashboard Grid
-  renderNotesDashboard: () => renderNotesDashboard(state.notes, state.activeFolderId, state.activeLibraryFilter, setActiveNote),
+  renderNotesDashboard: () => renderNotesDashboard(state.notes, state.activeFolderId, state.activeLibraryFilter, setActiveNote, {
+    deleteNote: (id) => handleDeleteNote(state.notes, id, state.activeUser, callbacks)
+  }),
   // Updates the UI to show the current user's information
   updateUserDisplay: () => {
     updateUserDisplay(state.activeUser);

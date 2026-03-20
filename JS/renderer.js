@@ -257,8 +257,9 @@ export function updateToolbarMetadata(note, overrideContent) {
  * @param {string|null} activeFolderId - Currently selected folder ID
  * @param {string} activeLibraryFilter - Active library filter ('all', 'favorites', etc.)
  * @param {Function} setActiveNote - Callback to open a note
+ * @param {Object} noteActions - Actions like deleteNote
  */
-export function renderNotesDashboard(notes, activeFolderId, activeLibraryFilter, setActiveNote) {
+export function renderNotesDashboard(notes, activeFolderId, activeLibraryFilter, setActiveNote, noteActions) {
   const gridEl = $("#dashboard-grid");
   const statsEl = $("#dashboard-stats");
   const titleEl = $(".dashboard-title");
@@ -312,10 +313,24 @@ export function renderNotesDashboard(notes, activeFolderId, activeLibraryFilter,
       <p class="note-preview-compact">${escapeHtml(previewText || "Empty note")}</p>
       <div class="note-card-footer">
         <time class="note-time-label">${formatDate(note.updatedAt)}</time>
+        <button class="note-card-delete" title="Delete Note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
       </div>
     `;
 
     card.addEventListener("click", () => setActiveNote(note.id));
+
+    const deleteBtn = card.querySelector(".note-card-delete");
+    if (deleteBtn && noteActions) {
+      deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (confirm("Are you sure you want to delete this note?")) {
+          noteActions.deleteNote(note.id);
+        }
+      });
+    }
+
     gridEl.appendChild(card);
   });
 }
