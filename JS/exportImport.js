@@ -123,15 +123,28 @@ export function exportNotes(notes, format = 'txt', customFilename = null) {
 
 function printNotes(notes) {
   const printContent = notes.map(note => `
-    <div class="note-print-item" style="margin-bottom: 50px; page-break-after: auto;">
-      <h1 style="color: #111; font-size: 28px; margin: 0 0 8px 0; border-bottom: 2px solid #333; padding-bottom: 5px;">${escapeHtml(note.title || "Untitled Note")}</h1>
-      <div style="font-size: 11px; color: #666; margin-bottom: 25px; display: flex; gap: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
-        <span><strong>Date:</strong> ${escapeHtml(formatDate(note.updatedAt))}</span>
-        <span><strong>Tags:</strong> ${escapeHtml((note.tags || []).join(", ") || "None")}</span>
-        ${note.folderId ? `<span><strong>Collection:</strong> Sub-Folder</span>` : ""}
-      </div>
-      <div class="note-print-content" style="line-height: 1.6; color: #333; font-size: 15px;">
-        ${note.content || "(No content)"}
+    <div class="note-print-wrapper">
+      <div class="note-print-item">
+        <h1 class="document-title">${escapeHtml(note.title || "Untitled Note")}</h1>
+        <div class="document-metadata">
+          <div class="meta-col">
+            <span class="meta-label">Date Published</span>
+            <span class="meta-value">${escapeHtml(formatDate(note.updatedAt))}</span>
+          </div>
+          <div class="meta-col">
+            <span class="meta-label">Tags</span>
+            <span class="meta-value">${escapeHtml((note.tags || []).join(", ") || "No specific tags")}</span>
+          </div>
+          ${note.folderId ? `
+          <div class="meta-col">
+            <span class="meta-label">Collection</span>
+            <span class="meta-value">Global Workspace / Sub Folder</span>
+          </div>` : ""}
+        </div>
+        
+        <div class="note-print-content">
+          ${note.content || "<p>(This note has no text content)</p>"}
+        </div>
       </div>
     </div>
   `).join("");
@@ -145,51 +158,206 @@ function printNotes(notes) {
   printWindow.document.write(`
     <html>
       <head>
-        <title>Global Notes - Professional Export</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+        <title>Global Notes - Premium Export</title>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
         <style>
-          @page { size: A4; margin: 25.4mm; }
-          body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            padding: 20px; 
-            max-width: 800px; 
-            margin: 0 auto; 
-            color: #111;
-            line-height: 1.5;
+          @page { 
+            size: A4; 
+            margin: 20mm;
+            @bottom-right {
+              content: "Page " counter(page) " of " counter(pages);
+              font-family: 'Inter', sans-serif;
+              font-size: 9pt;
+              color: #999;
+            }
           }
-          .note-print-content p { margin: 12px 0; }
-          .note-print-content ul, .note-print-content ol { padding-left: 20px; margin: 12px 0; }
-          .note-print-content li { margin-bottom: 6px; }
-          .note-print-item { page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 30px; margin-bottom: 40px; }
-          .note-print-item:last-of-type { border-bottom: none; }
           
-          img, video { max-width: 100%; height: auto; border-radius: 4px; display: block; margin: 15px 0; }
-          pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: monospace; font-size: 13px; }
-          code { font-family: monospace; background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
+          :root {
+            --primary-charcoal: #1e293b;
+            --secondary-slate: #64748b;
+            --accent-blue: #3b82f6;
+            --border-light: #e2e8f0;
+          }
+
+          body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background: #fff;
+            color: var(--primary-charcoal);
+            line-height: 1.6;
+            margin: 0;
+            padding: 30px;
+          }
+
+          /* Premium Branding Header */
+          .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-charcoal);
+            padding-bottom: 15px;
+            margin-bottom: 40px;
+          }
+          .brand-logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 18pt;
+            letter-spacing: -0.5px;
+            color: var(--primary-charcoal);
+          }
+          .brand-logo span { color: var(--accent-blue); }
+          .doc-type {
+            font-size: 9pt;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--secondary-slate);
+          }
+
+          /* Document Title & Metadata */
+          .document-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32pt;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            line-height: 1.1;
+            color: var(--primary-charcoal);
+          }
+          .document-metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 40px;
+          }
+          .meta-col { display: flex; flex-direction: column; }
+          .meta-label { 
+            font-size: 7pt; 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            color: var(--secondary-slate); 
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+          }
+          .meta-value { font-size: 10pt; font-weight: 500; }
+
+          /* Content Styling */
+          .note-print-content { 
+            font-size: 11.5pt; 
+            color: #334155;
+          }
+          .note-print-content h1, .note-print-content h2, .note-print-content h3 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary-charcoal);
+            margin-top: 30px;
+            margin-bottom: 10px;
+          }
+          .note-print-content h1 { font-size: 20pt; }
+          .note-print-content h2 { font-size: 16pt; }
+          .note-print-content h3 { font-size: 14pt; }
+          
+          .note-print-content p { margin-bottom: 16px; font-size: 11pt; }
+          
+          .note-print-content ul, .note-print-content ol { 
+            margin-bottom: 16px; 
+            padding-left: 1.5rem;
+          }
+          .note-print-content li { margin-bottom: 8px; font-size: 11pt; }
+          
+          .note-print-wrapper { page-break-after: always; }
+          .note-print-wrapper:last-child { page-break-after: auto; }
+
+          img, video { 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 8px; 
+            display: block; 
+            margin: 25px 0; 
+            border: 1px solid var(--border-light);
+          }
+          pre { 
+            background: #f8fafc; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border-left: 4px solid var(--accent-blue);
+            font-family: 'Consolas', monospace; 
+            font-size: 10pt; 
+            margin: 20px 0;
+            white-space: pre-wrap;
+          }
+          code { font-family: monospace; background: #eff6ff; color: var(--accent-blue); padding: 2px 6px; border-radius: 4px; }
+          
+          blockquote {
+            border-left: 4px solid var(--border-light);
+            padding-left: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--secondary-slate);
+          }
 
           @media print {
-            body { padding: 0; width: 100%; max-width: none; }
+            body { padding: 0; }
             .no-print { display: none; }
-            .note-print-item { border-bottom: 1px solid #ddd; }
+            .document-header { margin-top: 0; }
           }
           
           .footer {
-            margin-top: 60px;
-            text-align: center;
-            font-size: 11px;
-            color: #999;
-            border-top: 1px solid #ddd;
+            margin-top: 80px;
             padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
           }
+          .footer-text { font-size: 8pt; color: var(--secondary-slate); }
+          .page-counter:after { content: "Page " counter(page); font-size: 8pt; color: var(--secondary-slate); }
+          
+          /* Print Buttons */
+          .print-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 12px;
+          }
+          .btn-print {
+            padding: 12px 24px;
+            background: var(--primary-charcoal);
+            color: #fff;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 10pt;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Outfit', sans-serif;
+          }
+          .btn-print:hover { transform: translateY(-2px); background: #000; }
         </style>
       </head>
       <body>
-        <div style="text-align: right; margin-bottom: 30px;" class="no-print">
-          <button onclick="window.print()" style="padding: 10px 20px; background: #111; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-family: inherit;">Print Document</button>
+        <div class="print-controls no-print">
+          <button onclick="window.print()" class="btn-print">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print to PDF
+          </button>
         </div>
+
+        <div class="document-header">
+          <div class="brand-logo">Global Notes <span>Workspace</span></div>
+          <div class="doc-type">Intelligence Report</div>
+        </div>
+
         ${printContent}
-        <div class="footer">
-          Document generated by Global Notes Workspace &bull; ${new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+
+        <div class="footer no-print">
+          <div class="footer-text">Verified Document &bull; ${new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          <div class="page-counter"></div>
         </div>
       </body>
     </html>
