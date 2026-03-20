@@ -1,4 +1,4 @@
-import { stripHtml, escapeHtml } from "./utilities.js";
+import { stripHtml, escapeHtml, formatDate } from "./utilities.js";
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -40,15 +40,33 @@ export function formatNotesAsText(notes) {
 // Converts HTML content to basic Markdown
 function htmlToMarkdown(html) {
   let text = html || "";
+  // Headings
+  text = text.replace(/<h1.*?>(.*?)<\/h1>/gi, "\n# $1\n");
+  text = text.replace(/<h2.*?>(.*?)<\/h2>/gi, "\n## $1\n");
+  text = text.replace(/<h3.*?>(.*?)<\/h3>/gi, "\n### $1\n");
+  // Simple Formatting
   text = text.replace(/<b>(.*?)<\/b>/gi, "**$1**");
   text = text.replace(/<strong>(.*?)<\/strong>/gi, "**$1**");
   text = text.replace(/<i>(.*?)<\/i>/gi, "*$1*");
   text = text.replace(/<em>(.*?)<\/em>/gi, "*$1*");
+  text = text.replace(/<u>(.*?)<\/u>/gi, "__$1__");
+  text = text.replace(/<strike.*?>(.*?)<\/strike>/gi, "~~$1~~");
+  text = text.replace(/<s.*?>(.*?)<\/s>/gi, "~~$1~~");
+  // Lists
+  text = text.replace(/<li.*?>(.*?)<\/li>/gi, "\n* $1");
+  // Blocks
   text = text.replace(/<br\s*\/?>/gi, "\n");
   text = text.replace(/<div>/gi, "\n");
   text = text.replace(/<\/div>/gi, "");
   text = text.replace(/<p>(.*?)<\/p>/gi, "\n$1\n");
+  // Media
+  text = text.replace(/<img.*?src="(.*?)".*?>/gi, "\n![Note Image]($1)\n");
+  text = text.replace(/<video.*?src="(.*?)".*?>/gi, "\n[Embedded Video]($1)\n");
+  // Cleanup
   text = text.replace(/&nbsp;/g, " ");
+  text = text.replace(/&amp;/g, "&");
+  text = text.replace(/&lt;/g, "<");
+  text = text.replace(/&gt;/g, ">");
   // Strip remaining tags
   text = text.replace(/<[^>]*>/g, "");
   return text.trim();
@@ -67,19 +85,27 @@ export function formatNotesAsMarkdown(notes) {
   }).join("\n");
 }
 
-export function exportNotes(notes, format = 'txt') {
+export function exportNotes(notes, format = 'txt', customFilename = null) {
   if (format === 'pdf') {
     printNotes(notes);
     return;
   }
 
+  // Double check we have notes
+  if (!notes || notes.length === 0) {
+    alert("No notes found to export. Please draft or select a note first.");
+    return;
+  }
+
   let text = "";
-  let filename = "notes-backup.txt";
-  let type = "text/plain;charset=utf-8";
+  // Safe filename generator: handles spaces and null titles
+  const safeTitle = (notes[0] && notes[0].title ? notes[0].title : "untitled").toLowerCase().replace(/\s+/g, '-');
+  const baseFilename = notes.length === 1 ? `note-${safeTitle}` : "notes-backup";
+  let filename = customFilename || `${baseFilename}.${format}`;
+  let type = format === 'md' ? "text/markdown;charset=utf-8" : "text/plain;charset=utf-8";
 
   if (format === 'md') {
     text = formatNotesAsMarkdown(notes);
-    filename = "notes-export.md";
   } else {
     text = formatNotesAsText(notes);
   }
@@ -97,16 +123,16 @@ export function exportNotes(notes, format = 'txt') {
 
 function printNotes(notes) {
   const printContent = notes.map(note => `
-    <div style="margin-bottom: 2rem; page-break-inside: avoid;">
-      <h2 style="margin-bottom: 0.5rem;">${escapeHtml(note.title || "Untitled")}</h2>
-      <div style="font-size: 0.8em; color: #666; margin-bottom: 1rem;">
-        ${note.createdAt ? `Created: ${escapeHtml(note.createdAt)} | ` : ""}
-        Tags: ${escapeHtml((note.tags || []).join(", ") || "None")}
+    <div class="note-print-item" style="margin-bottom: 40px; page-break-after: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+      <h1 style="color: #1a1a2e; font-size: 26px; margin: 0 0 10px 0;">${escapeHtml(note.title || "Untitled Note")}</h1>
+      <div style="font-size: 11px; color: #7f8c8d; margin-bottom: 25px; display: flex; gap: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px;">
+        <span><strong>DATE:</strong> ${escapeHtml(formatDate(note.updatedAt))}</span>
+        <span><strong>TAGS:</strong> ${escapeHtml((note.tags || []).join(", ") || "None")}</span>
+        ${note.folderId ? `<span><strong>FOLDER:</strong> Sub-Collection</span>` : ""}
       </div>
-      <div style="line-height: 1.6;">
+      <div class="note-print-content" style="line-height: 1.8; color: #2c3e50; font-size: 14px; white-space: pre-wrap;">
         ${note.content || "(No content)"}
       </div>
-      <hr style="margin-top: 2rem; border: none; border-top: 1px solid #ddd;">
     </div>
   `).join("");
 
@@ -119,19 +145,50 @@ function printNotes(notes) {
   printWindow.document.write(`
     <html>
       <head>
-        <title>Notes Export</title>
+        <title>Global Notes - Professional Export</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
         <style>
-          body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; }
-          img { max-width: 100%; }
+          body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            padding: 40px; 
+            max-width: 850px; 
+            margin: 0 auto; 
+            background: #fff;
+            color: #2c3e50;
+          }
+          img, video { max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #f0f0f0; }
+          pre, code { font-family: 'Courier New', monospace; background: #f8f9fa; padding: 2px 4px; border-radius: 3px; }
+          .note-print-item { break-inside: avoid; }
+          @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+          }
+          .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: #bdc3c7;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 20px;
+          }
         </style>
       </head>
       <body>
+        <div style="text-align: right; margin-bottom: 20px;" class="no-print">
+          <button onclick="window.print()" style="padding: 8px 16px; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Print to PDF</button>
+        </div>
         ${printContent}
-        <div style="margin-top: 3rem; text-align: center; font-size: 0.8em; color: #888; border-top: 1px solid #eee; padding-top: 1rem;">
-          Created via Global Notes Workspace
+        <div class="footer">
+          Generated via Global Notes Workspace &bull; ${new Date().toLocaleDateString()}
         </div>
         <script>
-          window.onload = () => { window.print(); window.close(); };
+          window.onload = () => { 
+            // Give a tiny bit of time for images to potentially load
+            setTimeout(() => {
+               // We don't auto-print/close to let user see the professional preview first
+               // if (confirm("Start printing now?")) window.print();
+            }, 500);
+          };
         </script>
       </body>
     </html>
@@ -140,58 +197,93 @@ function printNotes(notes) {
 }
 
 // Sets up event listeners for import/export functionality
-export function wireImportExport(state) { // Accepts state object now
+export function wireImportExport(state) {
   $("#export")?.addEventListener("click", () => {
-    // Restrict export to logged-in users
-    if (!state.activeUser) {
-      alert("Please login to use the export feature.");
-      window.location.href = "./HTML/signup.html";
+    // Check if there are any notes at all
+    if (!state.notes || state.notes.length === 0) {
+      alert("No notes available to export. Create a note first!");
       return;
     }
 
-    // Check if we already have the modal
     let modal = document.getElementById("export-modal");
     if (!modal) {
-      // Lazy create modal
+      // Lazy create the modal if not present in the DOM (e.g. on landing pages or old builds)
+      console.log("Lazy creating export modal...");
       document.body.insertAdjacentHTML('beforeend', `
         <dialog id="export-modal" class="modal">
           <div class="modal-content">
             <div class="modal-header">
-              <h2>Export Notes</h2>
-              <button class="btn-icon close-modal">×</button>
+              <h2>Export Workspace</h2>
+              <button class="btn-icon close-modal">&times;</button>
             </div>
-            <div style="display: grid; gap: 10px;">
-              <button class="btn" id="export-txt">Text File (.txt)</button>
-              <button class="btn" id="export-md">Markdown (.md)</button>
-              <button class="btn" id="export-pdf">PDF (Print View)</button>
+            <div class="modal-body">
+              <div class="export-options" style="display: grid; gap: 20px;">
+                <div class="export-section">
+                  <h3 style="margin-bottom: 8px; font-size: 0.8em; color: var(--text-secondary); text-transform: uppercase;">Active Note</h3>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn secondary" id="export-active-txt">Text (.txt)</button>
+                    <button class="btn secondary" id="export-active-md">Markdown (.md)</button>
+                    <button class="btn primary" id="export-active-pdf" style="grid-column: span 2;">Professional PDF</button>
+                  </div>
+                </div>
+                <div style="height: 1px; background: rgba(128,128,128,0.2);"></div>
+                <div class="export-section">
+                  <h3 style="margin-bottom: 8px; font-size: 0.8em; color: var(--text-secondary); text-transform: uppercase;">Backup All</h3>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn secondary" id="export-all-txt">All Files (.txt)</button>
+                    <button class="btn secondary" id="export-all-md">All Files (.md)</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </dialog>
       `);
       modal = document.getElementById("export-modal");
+    }
 
-      modal.querySelector(".close-modal").onclick = () => modal.close();
-      modal.onclick = (e) => { if (e.target === modal) modal.close(); };
+    // Helper for getting active note
+    const getActiveNote = () => state.notes.find(n => n.id === state.activeNoteId);
 
-      document.getElementById("export-txt").onclick = () => {
-        exportNotes(state.notes, 'txt');
-        modal.close();
-      };
-      document.getElementById("export-md").onclick = () => {
-        exportNotes(state.notes, 'md');
-        modal.close();
-      };
-      document.getElementById("export-pdf").onclick = () => {
-        const activeNote = state.notes.find(n => n.id === state.activeNoteId);
-        if (activeNote) {
-          exportNotes([activeNote], 'pdf');
+    // MAPPING ALL CLICKABLE IDs (New and Legacy for cached browsers)
+    const exportTargets = [
+      { id: "export-active-txt", notes: () => [getActiveNote()], format: 'txt' },
+      { id: "export-active-md", notes: () => [getActiveNote()], format: 'md' },
+      { id: "export-active-pdf", notes: () => [getActiveNote()], format: 'pdf' },
+      { id: "export-all-txt", notes: () => state.notes, format: 'txt' },
+      { id: "export-all-md", notes: () => state.notes, format: 'md' },
+      // LEGACY IDs (Support for old app.html versions)
+      { id: "export-txt", notes: () => state.notes, format: 'txt' },
+      { id: "export-md", notes: () => state.notes, format: 'md' },
+      { id: "export-pdf", notes: () => [getActiveNote()], format: 'pdf' }
+    ];
+
+    exportTargets.forEach(target => {
+      const btn = document.getElementById(target.id);
+      if (!btn) return;
+
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const nts = target.notes().filter(n => n); // Clean nulls
+
+        if (nts.length === 0) {
+          alert("Could not identify the note to export. Please make sure a note is selected.");
         } else {
-          alert("No note open to print.");
+          exportNotes(nts, target.format);
         }
         modal.close();
       };
-    }
+    });
 
-    document.getElementById("export-modal").showModal();
+    // Modal behavior (Close buttons and backdrop)
+    modal.querySelectorAll(".close-modal").forEach(b => {
+      b.onclick = () => modal.close();
+    });
+
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.close();
+    };
+
+    modal.showModal();
   });
 }

@@ -814,16 +814,37 @@
   <dialog id="export-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Export Notes</h2>
+        <h2>Export Workspace</h2>
         <button class="btn-icon close-modal">&times;</button>
       </div>
-      <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
-        <button class="btn secondary full-width" id="export-txt">Export as Text (.txt)</button>
-        <button class="btn secondary full-width" id="export-md">Export as Markdown (.md)</button>
-        <button class="btn secondary full-width" id="export-pdf">Export as PDF (Print)</button>
+      <div class="modal-body">
+        <div class="export-options" style="display: grid; gap: 20px;">
+          <div class="export-section">
+            <h3
+              style="margin-bottom: 12px; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
+              Current Active Note</h3>
+            <div class="export-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button class="btn secondary" id="export-active-txt">Plain Text (.txt)</button>
+              <button class="btn secondary" id="export-active-md">Markdown (.md)</button>
+              <button class="btn primary" id="export-active-pdf" style="grid-column: span 2;">Professional PDF</button>
+            </div>
+          </div>
+
+          <div class="export-divider" style="height: 1px; background: var(--border); margin: 5px 0;"></div>
+
+          <div class="export-section">
+            <h3
+              style="margin-bottom: 12px; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
+              All Notes (Full Backup)</h3>
+            <div class="export-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button class="btn secondary" id="export-all-txt">Backup All (.txt)</button>
+              <button class="btn secondary" id="export-all-md">Backup All (.md)</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn secondary close-modal">Cancel</button>
+      <div class="modal-footer" style="padding-top: 15px; text-align: center; font-size: 0.75em; opacity: 0.6;">
+        Files will be saved directly to your computer.
       </div>
     </div>
   </dialog>

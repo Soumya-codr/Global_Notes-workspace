@@ -3173,3 +3173,50 @@ html.theme-transitioning *::after {
     scroll-behavior: auto !important;
   }
 }
+
+/* ═══════════════════════════════════════════
+   EXPORT MODAL STYLES
+   ═══════════════════════════════════════════ */
+.export-options {
+  display: grid;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.export-section h3 {
+  margin-bottom: 4px;
+  font-size: 0.85em !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+}
+
+.export-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+}
+
+.export-divider {
+  height: 1px !important;
+  background: var(--border) !important;
+  margin: 12px 0 8px 0 !important;
+  opacity: 0.5 !important;
+}
+
+.export-section .btn {
+  height: 38px !important;
+  font-weight: 600 !important;
+  justify-content: center !important;
+  border-radius: var(--radius) !important;
+}
+
+.export-section .btn.primary {
+  box-shadow: 0 4px 12px var(--primary-glow) !important;
+}
+
+.export-section .btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow) !important;
+}
