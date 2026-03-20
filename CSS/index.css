@@ -1599,19 +1599,49 @@ html,
 }
 
 .dashboard-header {
-  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dashboard-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 4px;
 }
 
 .dashboard-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 4px;
 }
 
 .dashboard-stats {
   font-size: 13px;
   color: var(--text-dim);
+  font-weight: 500;
+}
+
+.sort-select-dashboard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.sort-select-dashboard:hover {
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 .dashboard-grid {
@@ -1664,7 +1694,8 @@ html,
 }
 
 .layout.fullscreen-editor .editor {
-  background: var(--bg); /* Darker background for focused writing */
+  background: var(--bg);
+  /* Darker background for focused writing */
 }
 
 .editor-view {
@@ -1698,6 +1729,7 @@ html,
   .dashboard-view {
     padding: 16px;
   }
+
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
@@ -2182,16 +2214,15 @@ html,
 
 .content-input[data-pattern="lined"] {
   --line-spacing: calc(var(--editor-font-size, 15px) * var(--base-line-height, 1.8));
-  background-image: repeating-linear-gradient(
-    transparent, 
-    transparent calc(var(--line-spacing) - 1px), 
-    var(--border) calc(var(--line-spacing) - 1px), 
-    var(--border) var(--line-spacing)
-  );
+  background-image: repeating-linear-gradient(transparent,
+      transparent calc(var(--line-spacing) - 1px),
+      var(--border) calc(var(--line-spacing) - 1px),
+      var(--border) var(--line-spacing));
   background-attachment: local;
   background-color: var(--surface);
   line-height: var(--line-spacing);
-  padding-top: calc(var(--line-spacing) * 0.38); /* Refined padding for better baseline alignment */
+  padding-top: calc(var(--line-spacing) * 0.38);
+  /* Refined padding for better baseline alignment */
 }
 
 .content-input[data-pattern="grid"] {

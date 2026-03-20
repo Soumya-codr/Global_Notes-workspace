@@ -6,122 +6,12 @@ const $ = (selector) => document.querySelector(selector);
 const $all = (selector) => Array.from(document.querySelectorAll(selector));
 
 // Renders the list of notes in the sidebar, filtered by folder and search criteria
+// NOTE: Rendering list items in sidebar is now disabled as per user request to prioritize grid view.
 export function renderNotesList(notes, activeNoteId, setActiveNote, activeFolderId, noteActions) {
   const listEl = $("#notes-list");
   if (!listEl) return;
   listEl.innerHTML = "";
-
-  // Filter notes by folder
-  // - When a specific folder is selected, show only notes in that folder
-  // - When "All Notes" is selected (activeFolderId === null), show only notes not in any folder
-  let notesToDisplay = notes;
-  if (activeFolderId === null) {
-    notesToDisplay = notes.filter((note) => !note.folderId);
-  } else if (activeFolderId !== undefined) {
-    notesToDisplay = notes.filter((note) => note.folderId === activeFolderId);
-  }
-
-  const visibleNotes = applyFilterSearchAndSort(notesToDisplay);
-  if (!visibleNotes.length) {
-    const emptyLi = document.createElement("li");
-    emptyLi.className = "note-item";
-    emptyLi.innerHTML =
-      '<div class="note-card"><p class="note-preview">No notes match your search or filters. Click "New note" to start or clear filters.</p></div>';
-    listEl.appendChild(emptyLi);
-    return;
-  }
-
-  visibleNotes.forEach((note, index) => {
-    const li = document.createElement("li");
-    li.className = "note-item" + (note.id === activeNoteId ? " active" : "");
-    li.dataset.id = note.id;
-    li.dataset.tags = (note.tags || []).join(", ");
-
-    const btn = document.createElement("button");
-    btn.className = "note-card";
-
-    // Apply theme to note card
-    if (note.theme) {
-      btn.setAttribute("data-theme", note.theme);
-    }
-
-
-    // Optimization: avoid running expensive regex on massive note content for a tiny preview
-    const rawContent = (note.content || "");
-    const plainContent = (rawContent.length > 500 ? rawContent.slice(0, 500) : rawContent).replace(/<[^>]*>/g, "");
-    const previewText =
-      plainContent && plainContent.trim().length > 0
-        ? plainContent.trim().slice(0, 120) + (plainContent.trim().length > 120 ? "…" : "")
-        : "Empty note";
-
-    const safeTitle = escapeHtml(note.title || "Untitled note");
-    const safeDatetime = escapeHtml(note.updatedAt || "");
-    const friendlyDate = escapeHtml(formatDate(note.updatedAt));
-    const safePreview = escapeHtml(previewText);
-
-    const tagsHtml = (note.tags || [])
-      .map(
-        (t) =>
-          `<span class="tag" style="--tag-color:${getTagColor(t)}">${escapeHtml(t)}</span>`
-      )
-      .join("");
-
-    const archiveActionHtml = note.isArchived
-      ? `<button class="note-action-btn unarchive-btn" title="Unarchive"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>`
-      : `<button class="note-action-btn archive-btn" title="Archive"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg></button>`;
-
-    const deleteActionHtml = `<button class="note-action-btn delete-item-btn" title="Delete Note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`;
-
-    btn.innerHTML = `
-    <div class="note-row">
-      <div class="note-main">
-        <h3 class="note-title">
-          ${safeTitle}
-          ${note.isFavorite ? '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none" class="fav-icon-small"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' : ''}
-        </h3>
-        <p class="note-preview-compact">${safePreview}</p>
-        ${tagsHtml ? `<span class="note-tags">${tagsHtml}</span>` : ''}
-      </div>
-      <time class="note-time-label" datetime="${safeDatetime}">${friendlyDate}</time>
-      <div class="note-actions-hover">
-        ${archiveActionHtml}
-        ${deleteActionHtml}
-      </div>
-    </div>
-    `;
-
-    btn.addEventListener("click", () => {
-      setActiveNote(note.id);
-    });
-
-    // Wire Archive/Unarchive buttons
-    const archiveBtn = btn.querySelector(".archive-btn");
-    if (archiveBtn && noteActions) {
-      archiveBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        noteActions.archiveNote(note.id);
-      });
-    }
-
-    const unarchiveBtn = btn.querySelector(".unarchive-btn");
-    if (unarchiveBtn && noteActions) {
-      unarchiveBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        noteActions.unarchiveNote(note.id);
-      });
-    }
-
-    const deleteBtn = btn.querySelector(".delete-item-btn");
-    if (deleteBtn && noteActions) {
-      deleteBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        noteActions.deleteNote(note.id);
-      });
-    }
-
-    li.appendChild(btn);
-    listEl.appendChild(li);
-  });
+  // Sidebar list is cleared; notes are now only primary in the dashboard grid.
 }
 
 // Displays the currently selected note in the main editor area
@@ -364,22 +254,47 @@ export function updateToolbarMetadata(note, overrideContent) {
 /**
  * Renders the Notes Dashboard (Gallery Grid)
  * @param {Array} notes - Notes to display
+ * @param {string|null} activeFolderId - Currently selected folder ID
+ * @param {string} activeLibraryFilter - Active library filter ('all', 'favorites', etc.)
  * @param {Function} setActiveNote - Callback to open a note
  */
-export function renderNotesDashboard(notes, setActiveNote) {
+export function renderNotesDashboard(notes, activeFolderId, activeLibraryFilter, setActiveNote) {
   const gridEl = $("#dashboard-grid");
   const statsEl = $("#dashboard-stats");
+  const titleEl = $(".dashboard-title");
   if (!gridEl) return;
 
   gridEl.innerHTML = "";
-  const visibleNotes = applyFilterSearchAndSort(notes).filter(n => !n.isArchived);
+
+  // 1. Initial Filtering based on Library/Folders
+  let filteredNotes = notes;
+
+  if (activeLibraryFilter === 'favorites') {
+    filteredNotes = notes.filter(n => n.isFavorite && !n.isArchived);
+    if (titleEl) titleEl.textContent = "Favorite Notes";
+  } else if (activeLibraryFilter === 'archived') {
+    filteredNotes = notes.filter(n => n.isArchived);
+    if (titleEl) titleEl.textContent = "Archived Notes";
+  } else if (activeFolderId) {
+    // Specific Folder Selected
+    filteredNotes = notes.filter(n => n.folderId === activeFolderId && !n.isArchived);
+    if (titleEl) titleEl.textContent = "Folder Notes";
+  } else {
+    // activeLibraryFilter === 'all' and no folder
+    // Show ONLY notes with NO folder (loose notes) as requested by user
+    filteredNotes = notes.filter(n => !n.folderId && !n.isArchived);
+    if (titleEl) titleEl.textContent = "My Notes (No Folder)";
+  }
+
+  // 2. Apply secondary filters (Search, Tag, Sort)
+  const visibleNotes = applyFilterSearchAndSort(filteredNotes);
 
   if (statsEl) {
     statsEl.textContent = `${visibleNotes.length} notes`;
   }
 
   if (!visibleNotes.length) {
-    gridEl.innerHTML = '<div class="note-card empty-dashboard"><p>No notes found. Create your first note!</p></div>';
+    gridEl.innerHTML = '<div class="note-card empty-dashboard"><p>No notes found in this section. Click "New note" to create one!</p></div>';
     return;
   }
 
