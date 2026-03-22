@@ -1,4 +1,3 @@
-import { getTagColor, formatDate, showConfirm, showPrompt } from "./utilities.js";
 import { getTagColor, formatDate, showConfirm } from "./utilities.js";
 import { getSelectedDate } from "./filterSearchSort.js";
 import {
@@ -105,8 +104,8 @@ export function wireFolderButtons(state, callbacks) {
   const foldersListEl = $("#folders-list");
 
   if (createFolderBtn) {
-    createFolderBtn.addEventListener("click", async () => {
-      const folderName = await showPrompt("New Folder", "", "Enter folder name...", "Create Folder");
+    createFolderBtn.addEventListener("click", () => {
+      const folderName = prompt("Enter folder name:");
       if (folderName && folderName.trim()) {
         const newFolder = createNewFolder(state.activeUser, folderName.trim());
         state.folders.push(newFolder);
@@ -151,18 +150,16 @@ export function wireFolderButtons(state, callbacks) {
         })();
       } else if (target.classList.contains("folder-rename-btn")) {
         event.stopPropagation();
-        (async () => {
-          const currentFolder = state.folders.find((f) => f.id === folderId);
-          const currentName = currentFolder ? currentFolder.name : "";
-          const newName = await showPrompt("Rename Folder", currentName, "Enter new name...", "Rename");
-          if (!newName || !newName.trim()) return;
+        const currentFolder = state.folders.find((f) => f.id === folderId);
+        const currentName = currentFolder ? currentFolder.name : "";
+        const newName = prompt("Rename folder:", currentName);
+        if (!newName || !newName.trim()) return;
 
-          renameFolder(state.activeUser, folderId, newName.trim());
-          if (currentFolder) {
-            currentFolder.name = newName.trim();
-          }
-          callbacks.renderFolders();
-        })();
+        renameFolder(state.activeUser, folderId, newName.trim());
+        if (currentFolder) {
+          currentFolder.name = newName.trim();
+        }
+        callbacks.renderFolders();
       }
     });
   }

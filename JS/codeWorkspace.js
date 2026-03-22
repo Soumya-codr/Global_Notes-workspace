@@ -2,7 +2,6 @@ import config from './config.js';
 import { generateTextWithGemini } from './geminiAPI.js';
 import { wireThemeToggle, setThemeStorageKey } from './themeManager.js';
 import { CODE_THEME_KEY } from './constants.js';
-import { showConfirm, showPrompt } from './utilities.js';
 import { showConfirm } from './utilities.js';
 
 const STORAGE_KEY = 'antigravity_snippets';
@@ -756,14 +755,14 @@ class CodeWorkspace {
         this.renderSnippetList();
     }
 
-    async saveSnippet() {
+    saveSnippet() {
         const code = this.editor.getValue();
         const language = document.getElementById('language-selector').value;
         let current = this.snippets.find(s => s.id === this.activeSnippetId);
         let title = current ? current.title : '';
 
         if (!current || title === 'Untitled Snippet') {
-            const newTitle = await showPrompt('Save Snippet', title || 'Untitled Snippet', 'Enter name...', 'Save');
+            const newTitle = prompt('Enter snippet title:', title || 'My Awesome Code');
             if (newTitle === null) return;
             title = newTitle || 'Untitled Snippet';
         }
